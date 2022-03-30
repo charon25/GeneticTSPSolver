@@ -19,6 +19,8 @@ class TSPSolver:
         """
 
         self.distances = distance_matrix
+        if any(len(self.distances) != len(row) for row in self.distances):
+            raise ValueError(f'Distance matrix should be square.')
         self.population_size = 100
         self.mutation_rate = 0.01
         self.new_individuals = 0
@@ -33,10 +35,12 @@ class TSPSolver:
         
         if self.population_size <= 0:
             raise ValueError(f'Population size ({self.population_size}) cannot be zero or negative.')
-        if self.new_individuals > self.population_size:
-            raise ValueError(f'There cannot be more new individuals ({self.new_individuals}) than the population size ({self.population_size}).')
         if not (1.0 >= self.mutation_rate >= 0.0):
             raise ValueError(f'Mutation rate ({self.mutation_rate}) should be between 0.0 and 1.0 (inclusive).')
+        if self.new_individuals > self.population_size:
+            raise ValueError(f'There cannot be more new individuals ({self.new_individuals}) than the population size ({self.population_size}).')
+        if self.new_individuals < 0:
+            raise ValueError(f'New individuals count ({self.new_individuals}) should be non negative.')
 
 
     def _compute_fitness(self, individual: List[int]):
