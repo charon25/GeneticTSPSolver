@@ -18,7 +18,7 @@ class TestDamages(unittest.TestCase):
             [3, 5]
         ]
 
-        TSPSolver(distances, population_size=1000, mutation_rate=0.5, new_individuals=10)
+        TSPSolver(distances, population_size=1000, mutation_rate=0.5, new_individuals=10, selection='best', breeder_count=100)
     
     def test_creation_with_wrong_parameters(self):
         distances = [
@@ -38,6 +38,16 @@ class TestDamages(unittest.TestCase):
             TSPSolver(distances, population_size=100, new_individuals=101)
         with self.assertRaises(ValueError):
             TSPSolver(distances, new_individuals=-1)
+        with self.assertRaises(ValueError):
+            TSPSolver(distances, elitism=-1)
+        with self.assertRaises(ValueError):
+            TSPSolver(distances, population_size=100, elitism=101)
+        with self.assertRaises(ValueError):
+            TSPSolver(distances, selection='string')
+        with self.assertRaises(ValueError):
+            TSPSolver(distances, breeder_count=-1)
+        with self.assertRaises(ValueError):
+            TSPSolver(distances, population_size=100, breeder_count=101)
         
     def test_fitness_calculation(self):
         distances = [
