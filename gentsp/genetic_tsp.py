@@ -16,7 +16,7 @@ class TSPSolver:
         Keyword args:
             population_size (int): Size of the population used for the algorithm (default : 100).
             
-            mutation_rate (float): Probability of mutation for any individual (default: 0.01).
+            mutation_rate (float): Probability of mutation for any individual (default: 0.05).
             
             new_individuals (int): Number of new random individual to add at each generation (default: 0).
             
@@ -36,7 +36,7 @@ class TSPSolver:
             raise ValueError(f'Distance matrix should be square.')
         self.node_count = len(self.distances)
         self.population_size = 100
-        self.mutation_rate = 0.01
+        self.mutation_rate = 0.05
         self.new_individuals = 0
         self.elitism = 0
         self.selection = 'weighted'
@@ -245,14 +245,48 @@ class TSPSolver:
         indexes = choices(mating_pool, k=breed_count)
 
         for i in range(breed_count):
-            parent1 = mating_pool[i]
-            parent2 = mating_pool[breed_count - i - 1]
+            parent1 = mating_pool[indexes[i]]
+            parent2 = mating_pool[indexes[breed_count - i - 1]]
             new_population.append(self._breed(parent1, parent2))
 
         # Random new individuals
         new_population.extend([self._create_random_individual() for _ in range(self.new_individuals)])
 
         return new_population
+
+
+    def _mutate(self, individual: List[int]) -> List[int]:
+        """With the given mutation rate, mutate an individual by swapping two of its nodes.
+
+        Args:
+            individual (List[int])
+
+        Returns:
+            List[int]: possibly mutated individual.
+        """
+        if random() < self.mutation_rate:
+            index1 = int(random() * self.node_count)
+            index2 = int(random() * self.node_count)
+
+            individual[index1], individual[index2] = individual[index2], individual[index1]
+
+        return individual
+
+
+    def _mutate_population(self, population: List[List[int]]) -> List[List[int]]:
+        """Apply mutate to all the population.
+
+        Args:
+            new_population (List[List[int]])
+
+        Returns:
+            List[List[int]]: Mutated population
+        """
+        for i in range(self.population_size):
+            population[i] = self._mutate(population[i])
+        
+        return population
+
 
     def pass_one_generation(self):
         fitnesses, total_fitness = self._sort_by_fitness(self.population)

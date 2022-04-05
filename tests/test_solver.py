@@ -162,6 +162,29 @@ class TestDamages(unittest.TestCase):
         self.assertEqual(list(sorted(set(child))), list(range(NODE_COUNT)))
         self.assertNotEqual(child, child2) # Will not always be true
 
+    def test_mutate_100(self):
+        NODE_COUNT = 50
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+
+        individual = list(range(NODE_COUNT))
+
+        solver = TSPSolver(distances, mutation_rate=1.0)
+
+        mutated = solver._mutate(individual)
+
+        self.assertNotEqual(individual, list(range(NODE_COUNT)))
+
+    def test_mutate_0(self):
+        NODE_COUNT = 50
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+
+        individual = list(range(NODE_COUNT))
+
+        solver = TSPSolver(distances, mutation_rate=0.0)
+
+        mutated = solver._mutate(individual)
+
+        self.assertEqual(individual, list(range(NODE_COUNT)))
 
 if __name__ == '__main__':
     unittest.main()
