@@ -2,7 +2,8 @@ from random import choices, random, shuffle
 from typing import Dict, List, Tuple, Union
 
 from numpy.random import choice
-from tqdm import tqdm
+from numpy import std
+from tqdm import trange
 
 
 class TSPSolver:
@@ -245,8 +246,8 @@ class TSPSolver:
         indexes = choices(mating_pool, k=breed_count)
 
         for i in range(breed_count):
-            parent1 = mating_pool[indexes[i]]
-            parent2 = mating_pool[indexes[breed_count - i - 1]]
+            parent1 = indexes[i]
+            parent2 = indexes[breed_count - i - 1]
             new_population.append(self._breed(parent1, parent2))
 
         # Random new individuals
@@ -310,6 +311,8 @@ class TSPSolver:
         stats['average_fitness'] = total_fitness / self.population_size
         stats['average_distance'] = 1 / stats['average_fitness']
 
+        stats['fitness_stdev'] = std([couple[0] for couple in fitnesses])
+
         stats['average_individual'] = fitnesses[0][1]
         min_diff_to_average = 10**99
         for fitness, individual in fitnesses:
@@ -320,16 +323,51 @@ class TSPSolver:
         return stats
 
 
-    def pass_one_generation(self) -> Tuple[List[int], Dict[str, Union[float, List[int]]]]:
-        """Apply all the steps of one generation, and returns both the new population and the stats of this generation.
+    def pass_one_generation(self) -> Dict[str, Union[float, List[int]]]:
+        """Apply all the steps of one generation, and returns the stats of this generation.
 
         Returns:
-            Tuple[List[int], Dict[str, Union[float, List[int]]]]: A tuple containing the new population and the stats of the generation.
+            Dict[str, Union[float, List[int]]]: The statisticss of the generation.
         """
 
         fitnesses, total_fitness = self._sort_by_fitness(self.population)
         mating_pool = self._get_mating_pool(fitnesses, total_fitness)
         new_population = self._breed_population(fitnesses, mating_pool)
-        mutated_population = self._mutate_population(new_population)
+        self.population = self._mutate_population(new_population)
 
-        return (mutated_population, self._get_population_stats(fitnesses, total_fitness))
+        return self._get_population_stats(fitnesses, total_fitness)
+
+
+    def pass_generations(self, n_generations: int) -> Dict[str, List[Union[float, List[int]]]]:
+        stats: Dict[str, List[Union[float, List[int]]]] = {}
+
+        for _ in trange(n_generations, desc='Generations'):
+            generation_stats = self.pass_one_generation()
+
+            for key, value in generation_stats.items():
+                if not key in stats:
+                    stats[key] = []
+
+                stats[key].append(value)
+
+        return stats
+
+
+if __name__ == '__main__':
+
+    # Minimum distance in this example is 9
+    distances = [
+        [0, 7, 9, 6, 1],
+        [7, 0, 3, 4, 9],
+        [9, 3, 0, 2, 5],
+        [6, 4, 2, 0, 3],
+        [1, 9, 5, 3, 0]
+    ]
+
+    solver = TSPSolver(distances)
+
+    stats = solver.pass_generations(100)
+
+    print(f'Average distance after 100 generations : {stats["average_distance"][-1]:.1f}')
+    print(f'Best distance after 100 generations : {stats["best_distance"][-1]:.1f}')
+    print(f'Best individual : {stats["best_individual"][-1]}')
