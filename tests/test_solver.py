@@ -214,7 +214,7 @@ class TestDamages(unittest.TestCase):
                 'worst_individual': [1, 0, 2],
                 'average_fitness': TOTAL_FITNESS / 4,
                 'average_distance': 4 / TOTAL_FITNESS,
-                'average_individual': [1, 2, 0]
+                'average_individual': [1, 2, 0],
             }
         )
         
