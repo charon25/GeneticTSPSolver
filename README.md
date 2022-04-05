@@ -35,7 +35,7 @@ The solver has only one mandatory argument : a square `distances` matrix which i
 - `population_size` (int, value > 0, default: 100): size of the population of the GA.
 - `mutation_rate` (float, 1.0 >= value >= 0, default: 0.05): probability of mutation of every individual
 - `new_individuals` (int, value >= 0, default: 0): number of new random individuals in each generation (introduces novelty).
-- `elitism` (int, value >= 0, default: 0): number of individuals to keep between every generation (only the best are kept).
+- `elitism` (int, value >= 0, default:  population_size / 5): number of individuals to keep between every generation (only the best are kept).
 - `selection` (str, 'best' or 'weighted', default: 'weighted'): method to chose the individuals which will breed:
    - `best` will use the best one (sort by increasing distance)
    - `weighted` will pick randomly with a probability proportional to the inverse of the distance

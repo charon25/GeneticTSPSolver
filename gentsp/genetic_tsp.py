@@ -21,7 +21,7 @@ class TSPSolver:
             
             new_individuals (int): Number of new random individual to add at each generation (default: 0).
             
-            elitism (int): Number of individual to carry over each generation (default: 0).
+            elitism (int): Number of individual to carry over each generation (default: population_size / 5).
             
             selection (str): Method to select which individuals can breed. Should be "best" or "weighted" (default: "weighted").
             "best" selects the individuals with the best fitness. "weighted" picks the individuals with probability proportional to their fitness.
@@ -39,7 +39,7 @@ class TSPSolver:
         self.population_size = 100
         self.mutation_rate = 0.05
         self.new_individuals = 0
-        self.elitism = 0
+        self.elitism = None
         self.selection = 'weighted'
         self.breeder_count = None
 
@@ -57,6 +57,8 @@ class TSPSolver:
             elif arg == 'breeder_count':
                 self.breeder_count = int(kwargs[arg])
 
+        if self.elitism is None:
+            self.elitism = int(self.population_size // 5)
         if self.breeder_count is None:
             self.breeder_count = int(self.population_size // 2)
 
