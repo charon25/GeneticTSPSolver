@@ -80,5 +80,18 @@ class TestDamages(unittest.TestCase):
             self.assertAlmostEqual(fitness, correct_fitnesses[k])
             self.assertListEqual(individual, correct_ordering[k])
 
+    def test_create_initial_population(self):
+        NODE_COUNT = 4
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+        POPULATION_SIZE = 50
+
+        solver = TSPSolver(distances, population_size=POPULATION_SIZE)
+
+        self.assertEqual(len(solver.population), POPULATION_SIZE)
+
+        for individual in solver.population:
+            self.assertEqual(len(individual), NODE_COUNT)
+            self.assertEqual(list(sorted(individual)), list(range(NODE_COUNT)))
+
 if __name__ == '__main__':
     unittest.main()

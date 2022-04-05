@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 
@@ -21,6 +22,7 @@ class TSPSolver:
         self.distances = distance_matrix
         if any(len(self.distances) != len(row) for row in self.distances):
             raise ValueError(f'Distance matrix should be square.')
+        self.node_count = len(self.distances)
         self.population_size = 100
         self.mutation_rate = 0.01
         self.new_individuals = 0
@@ -41,6 +43,8 @@ class TSPSolver:
             raise ValueError(f'There cannot be more new individuals ({self.new_individuals}) than the population size ({self.population_size}).')
         if self.new_individuals < 0:
             raise ValueError(f'New individuals count ({self.new_individuals}) should be non negative.')
+
+        self._create_initial_population()
 
 
     def _compute_fitness(self, individual: List[int]):
@@ -82,3 +86,12 @@ class TSPSolver:
         fitnesses.sort(key=lambda couple: couple[0], reverse=True)
 
         return (fitnesses, total_fitness)
+
+
+    def _create_initial_population(self):
+        self.population: List[List[int]] = []
+
+        for _ in range(self.population_size):
+            cities = list(range(self.node_count))
+            random.shuffle(cities)
+            self.population.append(cities)
