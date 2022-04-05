@@ -1,5 +1,5 @@
 from random import choices, random, shuffle
-from typing import List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from numpy.random import choice
 from tqdm import tqdm
@@ -288,6 +288,48 @@ class TSPSolver:
         return population
 
 
-    def pass_one_generation(self):
+    def _get_population_stats(self, fitnesses: List[Tuple[float, List[int]]], total_fitness: float) -> Dict[str, Union[float, List[int]]]:
+        """Return some statistics about the population.
+
+        Args:
+            fitnesses (List[Tuple[float, List[int]]]): List of tuples with fitness and individuals, as returned by the _sort_by_fitness function.
+            total_fitness (float): Sum of all fitnesses
+
+        Returns:
+            Dict[str, Union[float, List[int]]]: Dictionary containing some statistics about the population.
+        """
+
+        stats = {}
+
+        stats['best_fitness'] = fitnesses[0][0]
+        stats['best_distance'] = 1 / fitnesses[0][0]
+        stats['best_individual'] = fitnesses[0][1]
+        stats['worst_fitness'] = fitnesses[-1][0]
+        stats['worst_distance'] = 1 / fitnesses[-1][0]
+        stats['worst_individual'] = fitnesses[-1][1]
+        stats['average_fitness'] = total_fitness / self.population_size
+        stats['average_distance'] = 1 / stats['average_fitness']
+
+        stats['average_individual'] = fitnesses[0][1]
+        min_diff_to_average = 10**99
+        for fitness, individual in fitnesses:
+            if abs(fitness - stats['average_fitness']) < min_diff_to_average:
+                min_diff_to_average = abs(fitness - stats['average_fitness'])
+                stats['average_individual'] = individual
+
+        return stats
+
+
+    def pass_one_generation(self) -> Tuple[List[int], Dict[str, Union[float, List[int]]]]:
+        """Apply all the steps of one generation, and returns both the new population and the stats of this generation.
+
+        Returns:
+            Tuple[List[int], Dict[str, Union[float, List[int]]]]: A tuple containing the new population and the stats of the generation.
+        """
+
         fitnesses, total_fitness = self._sort_by_fitness(self.population)
         mating_pool = self._get_mating_pool(fitnesses, total_fitness)
+        new_population = self._breed_population(fitnesses, mating_pool)
+        mutated_population = self._mutate_population(new_population)
+
+        return (mutated_population, self._get_population_stats(fitnesses, total_fitness))

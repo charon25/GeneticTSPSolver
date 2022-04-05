@@ -186,5 +186,38 @@ class TestDamages(unittest.TestCase):
 
         self.assertEqual(individual, list(range(NODE_COUNT)))
 
+    def test_get_population_stats(self):
+        BREEDER_COUNT = 2
+        NODE_COUNT = 3
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+
+        fitnesses = [
+            (0.8, [0, 1, 2]),
+            (0.5, [1, 2, 0]),
+            (0.2, [2, 0, 1]),
+            (0.1, [1, 0, 2])
+        ]
+        TOTAL_FITNESS = sum(couple[0] for couple in fitnesses)
+
+        solver = TSPSolver(distances, population_size=4, selection='weighted', breeder_count=BREEDER_COUNT)
+
+        stats = solver._get_population_stats(fitnesses, TOTAL_FITNESS)
+
+        self.assertDictEqual(
+            stats,
+            {
+                'best_fitness': 0.8,
+                'best_distance': 1 / 0.8,
+                'best_individual': [0, 1, 2],
+                'worst_fitness': 0.1,
+                'worst_distance': 1 / 0.1,
+                'worst_individual': [1, 0, 2],
+                'average_fitness': TOTAL_FITNESS / 4,
+                'average_distance': 4 / TOTAL_FITNESS,
+                'average_individual': [1, 2, 0]
+            }
+        )
+        
+
 if __name__ == '__main__':
     unittest.main()
