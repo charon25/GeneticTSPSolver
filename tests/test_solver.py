@@ -146,6 +146,22 @@ class TestDamages(unittest.TestCase):
                 if i != j:
                     self.assertNotEqual(mating_pool[i], mating_pool[j])
 
+    def test_breed(self):
+        BREEDER_COUNT = 2
+        NODE_COUNT = 10
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+
+        solver = TSPSolver(distances, population_size=4, selection='weighted', breeder_count=BREEDER_COUNT)
+
+        parent1 = list(range(NODE_COUNT))
+        parent2 = list(reversed(range(NODE_COUNT)))
+
+        child = solver._breed(parent1, parent2)
+        child2 = solver._breed(parent1, parent2)
+
+        self.assertEqual(list(sorted(set(child))), list(range(NODE_COUNT)))
+        self.assertNotEqual(child, child2) # Will not always be true
+
 
 if __name__ == '__main__':
     unittest.main()

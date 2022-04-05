@@ -1,4 +1,4 @@
-from random import choices, shuffle
+from random import choices, random, shuffle
 from typing import List, Tuple
 
 from numpy.random import choice
@@ -186,6 +186,40 @@ class TSPSolver:
             return self._get_mating_pool_weighted(fitnesses, total_fitness)
         else:
             raise ValueError(f"Unknown selection method ('{self.selection}').")
+
+
+    def _breed(self, parent1: List[int], parent2: List[int]) -> List[int]:
+        """Breed the two parents randomly into a new individual.
+
+        Args:
+            parent1 (List[int])
+
+            parent2 (List[int])
+
+        Returns:
+            List[int]: new individual.
+        """
+        child: List[int] = [-1 for _ in range(self.node_count)]
+
+        start = int(random() * self.node_count)
+        end = int(random() * self.node_count)
+
+        if start > end:
+            start, end = end, start
+        
+        child[start:end] = parent1[start:end]
+
+        for i in range(self.node_count):
+            if start <= i < end:
+                continue
+
+            if child[i] == -1:
+                di = 0
+                while parent2[(i + di) % self.node_count] in child:
+                    di += 1
+                child[i] = parent2[(i + di) % self.node_count]
+        
+        return child
 
 
     def _breed_population(self, fitnesses: List[Tuple[float, List[int]]], mating_pool: List[List[int]]) -> List[List[int]]:
