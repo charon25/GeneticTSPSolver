@@ -50,8 +50,8 @@ class TestDamages(unittest.TestCase):
         fitness1 = solver._compute_fitness([0, 2, 1])
         fitness2 = solver._compute_fitness([2, 1, 0])
 
-        self.assertAlmostEqual(fitness1, 1000 / (3 + 2))
-        self.assertAlmostEqual(fitness2, 1000 / (3 + 1))
+        self.assertAlmostEqual(fitness1, 1 / (3 + 2))
+        self.assertAlmostEqual(fitness2, 1 / (3 + 1))
 
     def test_fitness_sorting(self):
         distances = [
@@ -70,9 +70,11 @@ class TestDamages(unittest.TestCase):
         ]
 
         correct_ordering = [[2, 3, 0, 1], [0, 1, 2, 3], [0, 3, 1, 2]]
-        correct_fitnesses = [1000 / (6 + 3 + 1), 1000 / (1 + 4 + 6), 1000 / (3 + 5 + 4)]
+        correct_fitnesses = [1 / (6 + 3 + 1), 1 / (1 + 4 + 6), 1 / (3 + 5 + 4)]
 
-        sorted_individuals = solver._sort_by_fitness(individuals)
+        sorted_individuals, total_fitness = solver._sort_by_fitness(individuals)
+
+        self.assertAlmostEqual(total_fitness, 1 / (6 + 3 + 1) + 1 / (1 + 4 + 6) + 1 / (3 + 5 + 4))
 
         for k, (fitness, individual) in enumerate(sorted_individuals):
             self.assertAlmostEqual(fitness, correct_fitnesses[k])

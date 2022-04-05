@@ -50,29 +50,35 @@ class TSPSolver:
             individual (List[int]): Individual (ordered list of nodes).
 
         Returns:
-            fitness (float): Inverse of the total distance multiplied by 1000.
+            fitness (float): Inverse of the total distance.
         """
 
         total_distance = 0
         for node1, node2 in zip(individual, individual[1:]):
             total_distance += self.distances[node1][node2]
         
-        return 1000 / total_distance
+        return 1 / total_distance
+
 
     def _sort_by_fitness(self, individuals: List[List[int]]):
-        """Compute the fitness of every individuals and sort them in a decreasing order.
+        """Compute the fitness of every individuals and sort them in a decreasing order. Also return the total fitness (for the normalisation).
 
         Args:
             individuals (List[List[int]]): List of individuals (each individual is an ordered list of nodes).
 
         Returns:
-            fitnesses (List[Tuple[float, List[int]]]): List of the individuals sort by decreasing fitness. The list contains tuple of the form (fitness, individual).
+            fitnesses (Tuple[List[Tuple[float, List[int]]], float]): A tuple containing the list of the individuals sort by decreasing 
+            fitness as well as the total fitness. The list contains tuple of the form (fitness, individual).
         """
 
         fitnesses = list()
+        total_fitness = 0.0
+
         for individual in individuals:
-            fitnesses.append((self._compute_fitness(individual), individual))
+            fitness = self._compute_fitness(individual)
+            fitnesses.append((fitness, individual))
+            total_fitness += fitness
 
         fitnesses.sort(key=lambda couple: couple[0], reverse=True)
 
-        return fitnesses
+        return (fitnesses, total_fitness)
