@@ -13,5 +13,9 @@ setuptools.setup(
 	python_requires=">=3.7",
 	url="https://www.github.com/charon25/GenticTSPSolver",
 	license="MIT",
-	packages=['gentsp']
+	packages=['gentsp'],
+	install_requires=[
+		'tqdm>=4.62.3',
+		'numpy>=1.21.2'
+	]
 )

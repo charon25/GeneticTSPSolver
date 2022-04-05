@@ -103,5 +103,49 @@ class TestDamages(unittest.TestCase):
             self.assertEqual(len(individual), NODE_COUNT)
             self.assertEqual(list(sorted(individual)), list(range(NODE_COUNT)))
 
+    def test_select_mating_pool_method_best(self):
+        BREEDER_COUNT = 2
+        NODE_COUNT = 3
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+
+        fitnesses = [
+            (0.8, [0, 1, 2]),
+            (0.5, [1, 2, 0]),
+            (0.2, [2, 0, 1]),
+            (0.1, [1, 0, 2])
+        ]
+        TOTAL_FITNESS = sum(couple[0] for couple in fitnesses)
+
+        solver = TSPSolver(distances, population_size=4, selection='best', breeder_count=BREEDER_COUNT)
+
+        mating_pool = solver._get_mating_pool(fitnesses, TOTAL_FITNESS)
+
+        self.assertListEqual(mating_pool, [[0, 1, 2], [1, 2, 0]])
+
+    def test_select_mating_pool_method_weighted(self):
+        BREEDER_COUNT = 2
+        NODE_COUNT = 3
+        distances = [[0 for _ in range(NODE_COUNT)] for _ in range(NODE_COUNT)]
+
+        fitnesses = [
+            (0.8, [0, 1, 2]),
+            (0.5, [1, 2, 0]),
+            (0.2, [2, 0, 1]),
+            (0.1, [1, 0, 2])
+        ]
+        TOTAL_FITNESS = sum(couple[0] for couple in fitnesses)
+
+        solver = TSPSolver(distances, population_size=4, selection='weighted', breeder_count=BREEDER_COUNT)
+
+        mating_pool = solver._get_mating_pool(fitnesses, TOTAL_FITNESS)
+
+        self.assertEqual(len(mating_pool), BREEDER_COUNT)
+
+        for i in range(BREEDER_COUNT):
+            for j in range(BREEDER_COUNT):
+                if i != j:
+                    self.assertNotEqual(mating_pool[i], mating_pool[j])
+
+
 if __name__ == '__main__':
     unittest.main()
